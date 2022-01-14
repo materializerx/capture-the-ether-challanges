@@ -14,7 +14,9 @@ before(async () => {
   const factory = await ethers.getContractFactory(
     "GuessTheSecretNumberChallenge"
   );
-  contract = factory.attach(`0x5bDfC0D8bB558465b26D35AEB35263a811FbFb8c`);
+  // the contract block number has to match (or be greater than) with the block set in harhat.config 
+  // contract = factory.attach(`0x5bDfC0D8bB558465b26D35AEB35263a811FbFb8c`); // old
+  contract = factory.attach(`0xe07142B0643425603dC29277Fe68951cc5FE28aB`); // new
 });
 
 const bruteForceHash = (range: number, targetHash: string) => {
