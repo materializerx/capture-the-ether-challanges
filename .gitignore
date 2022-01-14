@@ -4,3 +4,4 @@ artifacts
 coverage
 package-lock.json
 coverage.json
+.env
