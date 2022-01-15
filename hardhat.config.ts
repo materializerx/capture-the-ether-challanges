@@ -36,13 +36,13 @@ const config: HardhatUserConfig = {
       url: ARCHIVE_URL,
       accounts,
       gas: 2100000,
-      gasPrice: 8000000000,
+      gasPrice: 800000000000,
     },
     hardhat: {
       accounts,
       forking: {
         url: ARCHIVE_URL,
-        blockNumber: 11811324,
+        blockNumber: 11760848,
         // blockNumber: 11761240,
         enabled: true
       },
