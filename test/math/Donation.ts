@@ -27,6 +27,11 @@ it("solves the challenge", async function () {
   // https://blog.b9lab.com/storage-pointers-in-solidity-7dcfaa536089
   // always declare structs for local variables as storage or memory
   // and initialize them when declaring
+  
+  // Observation
+  // As of compiler version 0.5.0 and higher this issue has been systematically resolved as contracts with uninitialised storage pointers do no longer compile.
+  // https://swcregistry.io/docs/SWC-109
+
 
   // need to choose etherAmount in a way such that it overwrites the owner with our
   // address, the scale is wrong as well and uses 10^36 which makes it exploitable
