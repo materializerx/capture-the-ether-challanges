@@ -48,7 +48,7 @@ const config: HardhatUserConfig = {
         enabled: true
       },
       gas: 2100000,
-      gasPrice: 10045566399,
+      gasPrice: 30005088383,
       gasMultiplier: 1
     },
   },

