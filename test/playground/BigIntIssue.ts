@@ -1,3 +1,5 @@
+// Why are big numbers from a Number limited to 2^26 - 1 ? #17 
+// https://github.com/indutny/bn.js/issues/17
 
 // Note
 // BigInt(2 ** 256 - 1) doesn't produce right result. It calculates only 2 ** 256 part. 
