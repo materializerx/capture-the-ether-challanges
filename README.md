@@ -12,12 +12,12 @@
 - ~~Guess the random number~~
 - ~~Guess the new number~~
 - ~~Predict the future~~
-- ~~Predict the block hash~~
+- [WIP]Predict the block hash
 
 ### Math
 
 - ~~Token sale~~
-- ~~Token whale~~
+- [WIP]Token whale
 - ~~Retirement fund~~
 - ~~Mapping~~
 - ~~Donation~~
@@ -25,14 +25,14 @@
 
 ### Accounts
 
-Fuzzy identity
-Public Key
-Account Takeover
+- Fuzzy identity
+- Public Key
+- Account Takeover
 
 ### Miscellaneous
 
-Assume ownership
-Token bank
+- Assume ownership
+- Token bank
 
 
 ### [draft] Up and running
