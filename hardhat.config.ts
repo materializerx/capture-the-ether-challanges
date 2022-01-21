@@ -37,7 +37,7 @@ const config: HardhatUserConfig = {
       url: ARCHIVE_URL,
       accounts,
       gas: 2100000,
-      gasPrice: 10045566399,
+      gasPrice: 90005088383,
     },
     hardhat: {
       accounts,

