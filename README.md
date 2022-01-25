@@ -17,7 +17,7 @@
 ### Math
 
 - ~~Token sale~~
-- [WIP]Token whale
+- ~~Token whale~~
 - ~~Retirement fund~~
 - ~~Mapping~~
 - ~~Donation~~
@@ -25,13 +25,13 @@
 
 ### Accounts
 
-- Fuzzy identity
-- Public Key
-- Account Takeover
+- [WIP]Fuzzy identity
+- [WIP]Public Key
+- [WIP]Account Takeover
 
 ### Miscellaneous
 
-- Assume ownership
+- [WIP]Assume ownership
 - Token bank
 
 
