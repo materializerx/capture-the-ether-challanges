@@ -8,7 +8,7 @@ import { HDNode } from "ethers/lib/utils";
 let accounts: Signer[];
 let eoa: Signer;
 let attacker: Contract;
-let contract: Contract; // challenge contract
+let contract: Contract;
 let tx: any;
 
 before(async () => {
