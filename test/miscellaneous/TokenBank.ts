@@ -1,9 +1,6 @@
-import crypto, { sign } from "crypto";
 import { ethers } from "hardhat";
-import { BigNumber, Contract, Signer } from "ethers";
+import { Contract, Signer } from "ethers";
 import { expect } from "chai";
-// import { formatEtherscanTx } from "../utils/format";
-import { HDNode } from "ethers/lib/utils";
 
 let accounts: Signer[];
 let eoa: Signer;
@@ -57,6 +54,17 @@ it("solves the challenge", async function () {
   expect(attackerBalance).to.eq(ATTACKER_INITIAL_BALANCE);
 
   tx = await attacker.attack();
+  
+  /* function call stack
+      attack()
+      callWithdraw() // down : InitialBalance = 50000
+      challenge.withdraw(50000) // up : balanceOf[attacker] => 0 - 50000 => underflows
+      tokenFallback()
+      callWithdraw() // down : InitialBalance = 50000 
+      challenge.withdraw(50000) // up : balanceOf[attacker] => 50000 - 50000 => 0
+      tokenFallback()
+      callWithdraw() // down : remainingBalance = 0, bubble up!
+   */
   await tx.wait();
 
   const isComplete = await contract.isComplete();

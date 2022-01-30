@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 import "hardhat/console.sol";
 
@@ -35,6 +36,8 @@ contract TokenBankAttacker {
 
     function attack() external payable {
         callWithdraw();
+
+        console.log("attacker balance underflows : ", challenge.balanceOf(address(this)));
         // if something went wrong, revert
         require(challenge.isComplete(), "challenge not completed");
     }

@@ -25,14 +25,14 @@
 
 ### Accounts
 
-- [WIP]Fuzzy identity
+- ~~Fuzzy identity~~
 - [WIP]Public Key
 - [WIP]Account Takeover
 
 ### Miscellaneous
 
-- [WIP]Assume ownership
-- Token bank
+- ~~Assume ownership~~
+- ~~Token bank~~
 
 
 ### [draft] Up and running
