@@ -17,7 +17,8 @@ before(async () => {
     "TokenBankChallenge"
   );
   challengeContract = challengeFactory.attach(
-    `0xa649bBE9F268fB18008179e8759EA396BB56f90A`
+    // `0xa649bBE9F268fB18008179e8759EA396BB56f90A` old
+    `0x304cD4253Ff3E2fdE72a5cae1418b2C04c3236b4`
   );
 });
 

